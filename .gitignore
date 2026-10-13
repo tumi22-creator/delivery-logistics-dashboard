@@ -1,0 +1,30 @@
+# Environment variables and secrets
+.env
+.env.*
+!.env.example
+**/application-local.properties
+**/application-prod.properties
+
+# Java / Gradle
+**/build/
+**/.gradle/
+
+# Node / Vite
+**/node_modules/
+**/dist/
+**/coverage/
+
+# IDE and operating system
+.idea/
+.vscode/
+*.iml
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+
+# Logs and potentially sensitive diagnostics
+**/error.txt
+*.log
