@@ -24,12 +24,9 @@ public class SecurityConfig {
             .cors(Customizer.withDefaults())
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers(
-                    "/api/deliveries", "/api/deliveries/**",
-                    "/api/drivers", "/api/drivers/**",
-                    "/api/vehicles", "/api/vehicles/**",
-                    "/api/assignments", "/api/assignments/**"
-                )
-                .permitAll()
+                    "/actuator/health",
+                    "/actuator/health/**"
+                ).permitAll()
                 .anyRequest().authenticated()
             )
             .httpBasic(Customizer.withDefaults());

@@ -1011,7 +1011,77 @@ button {
 }
 
 
+.login-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: #f4f6fa;
+}
+
+.login-card {
+  width: 100%;
+  max-width: 420px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding: 32px;
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 12px 40px rgba(15, 23, 42, 0.1);
+}
+
+.login-card h1,
+.login-card h2,
+.login-card p {
+  margin: 0;
+}
+
+.login-card h1 {
+  font-size: 30px;
+}
+
+.login-card h2 {
+  margin-top: 12px;
+  font-size: 22px;
+}
+
+.login-card label {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-weight: 600;
+}
+
+.login-card input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font: inherit;
+}
+
+.login-card .refresh-button {
+  width: 100%;
+}
 
 
 
+/* Fix dropdowns across FleetFlow */
+.data-table select,
+.delivery-status-filter,
+.vehicle-filters select,
+.driver-filters select,
+.assignment-filters select,
+.assignment-form select,
+.proof-form select {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;   
 
+
+
+}

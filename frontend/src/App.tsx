@@ -2,6 +2,8 @@
 import { useCallback, useEffect, useState } from 'react'
 import {
   api,
+  setAdminCredentials,
+  clearAdminCredentials,
   type Delivery,
   type Driver,
   type Vehicle,
@@ -30,6 +32,12 @@ function App() {
   const [loading, setLoading] = useState(true)
   const [refreshing, setRefreshing] = useState(false)
   const [error, setError] = useState('')
+
+  const [isAuthenticated, setIsAuthenticated] = useState(false)
+  const [loginEmail, setLoginEmail] = useState('admin@logistics.com')
+  const [loginPassword, setLoginPassword] = useState('')
+  const [loginLoading, setLoginLoading] = useState(false)
+  const [loginError, setLoginError] = useState('')
 
   // Search and filters
   const [searchTerm, setSearchTerm] = useState('')
@@ -127,7 +135,9 @@ function App() {
     }
   }, [])
 
-  useEffect(() => {
+    useEffect(() => {
+    if (!isAuthenticated) return
+
     void loadData()
 
     const interval = window.setInterval(() => {
@@ -135,7 +145,7 @@ function App() {
     }, 30000)
 
     return () => window.clearInterval(interval)
-  }, [loadData])
+  }, [isAuthenticated, loadData])
 
   // Dashboard statistics
   const completedDeliveries = deliveries.filter(
@@ -521,6 +531,43 @@ function App() {
     }
   }
 
+    const handleLogin = async (
+    event: React.FormEvent<HTMLFormElement>,
+  ) => {
+    event.preventDefault()
+    setLoginLoading(true)
+    setLoginError('')
+
+    try {
+      setAdminCredentials(loginEmail.trim(), loginPassword)
+
+      // Test credentials against a protected endpoint.
+      await api.getDrivers()
+
+      setIsAuthenticated(true)
+      setLoginPassword('')
+      setError('')
+    } catch (err) {
+      clearAdminCredentials()
+      setLoginError(
+        err instanceof Error
+          ? err.message
+          : 'Login failed. Check your credentials.',
+      )
+    } finally {
+      setLoginLoading(false)
+    }
+  }
+
+  const handleLogout = () => {
+    clearAdminCredentials()
+    setIsAuthenticated(false)
+    setLoginPassword('')
+    setLoginError('')
+    setError('')
+    setLoading(false)
+  }
+
   // Page action buttons
   const renderPageAction = () => {
     if (activePage === 'Dashboard' || activePage === 'Deliveries') {
@@ -590,6 +637,54 @@ function App() {
     return null
   }
 
+  if (!isAuthenticated) {
+    return (
+      <main className="login-page">
+        <form className="login-card" onSubmit={handleLogin}>
+          <h1>FleetFlow</h1>
+          <p>Delivery Management System</p>
+          <h2>Administrator Login</h2>
+
+          {loginError && (
+            <div className="error-banner" role="alert">
+              {loginError}
+            </div>
+          )}
+
+          <label>
+            Email Address
+            <input
+              type="email"
+              value={loginEmail}
+              onChange={(event) => setLoginEmail(event.target.value)}
+              autoComplete="username"
+              required
+            />
+          </label>
+
+          <label>
+            Password
+            <input
+              type="password"
+              value={loginPassword}
+              onChange={(event) => setLoginPassword(event.target.value)}
+              autoComplete="current-password"
+              required
+            />
+          </label>
+
+          <button
+            type="submit"
+            className="refresh-button"
+            disabled={loginLoading}
+          >
+            {loginLoading ? 'Signing in...' : 'Sign In'}
+          </button>
+        </form>
+      </main>
+    )
+  }
+
   return (
     <div className="app">
       <aside className="sidebar">
@@ -637,6 +732,13 @@ function App() {
               <strong>Administrator</strong>
               <small>Fleet Manager</small>
             </div>
+                        <button
+              type="button"
+              className="refresh-button"
+              onClick={handleLogout}
+            >
+              Log Out
+            </button>
           </div>
         </header>
 

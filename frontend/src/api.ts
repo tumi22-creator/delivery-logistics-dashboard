@@ -1,17 +1,46 @@
 
-const API_BASE_URL = 'http://localhost:8080/api'
+
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8081/api'
+
+function getAuthHeader(): string | null {
+  const credentials = sessionStorage.getItem('adminCredentials')
+  return credentials ? `Basic ${credentials}` : null
+}
+
+export function setAdminCredentials(email: string, password: string) {
+  sessionStorage.setItem(
+    'adminCredentials',
+    btoa(`${email}:${password}`),
+  )
+}
+
+export function clearAdminCredentials() {
+  sessionStorage.removeItem('adminCredentials')
+}
 
 async function request<T>(
   endpoint: string,
   options: RequestInit = {},
 ): Promise<T> {
+  const authHeader = getAuthHeader()
+
   const response = await fetch(`${API_BASE_URL}${endpoint}`, {
     ...options,
     headers: {
       'Content-Type': 'application/json',
+      ...(authHeader ? { Authorization: authHeader } : {}),
       ...options.headers,
     },
   })
+
+  if (response.status === 401) {
+    clearAdminCredentials()
+    throw new Error('Authentication failed. Please sign in again.')
+  }
+
+  if (response.status === 403) {
+    throw new Error('You do not have permission to perform this action.')
+  }
 
   if (!response.ok) {
     const message = await response.text()
@@ -24,6 +53,7 @@ async function request<T>(
 
   return response.json() as Promise<T>
 }
+
 
 export interface Delivery {
   id: number
